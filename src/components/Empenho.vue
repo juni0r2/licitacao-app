@@ -34,25 +34,7 @@
             </validation-provider>
           </v-col>
         </v-row>
-
-        <v-row>
-          <v-col cols="12" sm="4">
-            <vuetify-money
-                v-model="empenho.valor"
-                v-bind:label="label"
-                v-bind:placeholder="placeholder"
-                v-bind:readonly="readonly"
-                v-bind:disabled="disabled"
-                v-bind:outlined="outlined"
-                v-bind:clearable="clearable"
-                v-bind:valueWhenIsEmpty="valueWhenIsEmpty"
-                v-bind:options="options"
-                v-bind:properties="properties"
-            />
-          </v-col>
-
-        </v-row>
-
+        {{ soma }}
         <v-row align="center">
           <v-col
               class="d-flex"
@@ -68,10 +50,22 @@
           </v-col>
         </v-row>
 
-          <h3 class="mt-10">Listagem de Itens</h3>
         <v-row>
           <v-col sm="8">
+            <v-card>
+            <v-card-title>
+              Itens
+              <v-spacer></v-spacer>
+              <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Pesquisar"
+                  single-line
+                  hide-details
+              ></v-text-field>
+            </v-card-title>
             <v-data-table
+                :search="search"
                 v-model="selected"
                 :headers="headers"
                 :items="itens"
@@ -86,9 +80,28 @@
                     v-model="singleSelect"
                     label="Selecionar individual"
                     class="pa-3"
-                ></v-switch>
+                />
               </template>
             </v-data-table>
+            </v-card>
+          </v-col>
+
+        </v-row>
+
+        <v-row>
+          <v-col cols="12" sm="4">
+            <vuetify-money
+                v-model="valorEmpenho"
+                v-bind:label="label"
+                v-bind:placeholder="placeholder"
+                v-bind:readonly="readonly"
+                v-bind:disabled="disabled"
+                v-bind:outlined="outlined"
+                v-bind:clearable="clearable"
+                v-bind:valueWhenIsEmpty="valueWhenIsEmpty"
+                v-bind:options="options"
+                v-bind:properties="properties"
+            />
           </v-col>
 
         </v-row>
@@ -151,17 +164,18 @@ export default {
   },
   data: () => ({
 
+    search: '',
     itens: [],
     empenhos: [],
     clientes: [],
-    empenho: {},
     cliente: {},
+    empenho: {},
+    valorEmpenho: '',
     urlItem: 'http://localhost:8081/item',
     urlEmpenho: 'http://localhost:8081/empenho',
     urlCliente: 'http://localhost:8081/cliente',
     codigoItem: '',
     descricao: '',
-    value: '',
     label: 'Valor do Empenho',
     placeholder: '',
     readonly: false,
@@ -208,6 +222,13 @@ export default {
     this.buscarEmpenhos(),
     this.buscarClientes()
   },
+  computed: {
+    soma() {
+      this.valorEmpenho = this.selected.reduce((acumulador, valorAtual) => {
+      return acumulador + valorAtual.valorUnitario;
+      }, 0);
+    }
+  },
   methods: {
     submit () {
       this.$refs.observer.validate()
@@ -222,15 +243,12 @@ export default {
     },
     async buscarEmpenhos() {
       let {data} = await axios.get(this.urlEmpenho)
-      console.log(data)
       this.empenhos = data
     },
     async buscarClientes() {
       let {data} = await axios.get(this.urlCliente)
-      console.log(data)
       this.clientes = data
     },
-
     async salvar() {
       try {
         let {data} = await axios.post(this.urlEmpenho, this.empenho)

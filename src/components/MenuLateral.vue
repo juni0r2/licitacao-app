@@ -63,8 +63,8 @@ export default {
   data () {
     return {
       items: [
-        { title: 'Empenhos', icon: 'mdi-sitemap', to:'/empenhos' },
-        { title: 'Itens', icon: 'mdi-animation', to:'/' },
+        { title: 'Empenhos', icon: 'mdi-sitemap', to:'/' },
+        { title: 'Itens', icon: 'mdi-animation', to:'/itens' },
         { title: 'Clientes', icon: 'mdi-account-multiple', to:'/clientes' }
       ],
       right: null,

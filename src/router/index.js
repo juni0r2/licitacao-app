@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import CadastroItem from "@/components/CadastroItem";
 import Clientes from "@/components/Clientes";
+import Empenho from "@/components/Empenho";
 
 Vue.use(VueRouter)
 
@@ -9,10 +10,10 @@ const routes = [
   {
     path: '/',
     name: 'Empenhos',
-    component: CadastroItem
+    component: Empenho
   },
   {
-    path: '/',
+    path: '/itens',
     name: 'Itens',
     component: CadastroItem
   },

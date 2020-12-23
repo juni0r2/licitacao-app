@@ -157,7 +157,7 @@ import axios from "axios";
         codigoItem: '',
         descricao: '',
         value: '',
-        label: '',
+        label: 'Valor do Item',
         placeholder: '',
         readonly: false,
         disabled: false,
@@ -212,7 +212,6 @@ import axios from "axios";
         },
         async buscarItens() {
             let {data} = await axios.get(this.urlItem)
-            console.log(data)
             this.itens = data
         },
         async salvar() {

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import CadastroItem from "@/components/CadastroItem";
+import Item from "@/components/Item";
 import Clientes from "@/components/Clientes";
 import Empenho from "@/components/Empenho";
 
@@ -15,7 +15,7 @@ const routes = [
   {
     path: '/itens',
     name: 'Itens',
-    component: CadastroItem
+    component: Item
   },
   {
     path: '/clientes',

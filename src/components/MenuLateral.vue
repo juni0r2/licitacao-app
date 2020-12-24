@@ -40,6 +40,7 @@
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+
     </v-list>
 
     <div class="drawer-bottom">
@@ -63,9 +64,26 @@ export default {
   data () {
     return {
       items: [
-        { title: 'Empenhos', icon: 'mdi-sitemap', to:'/' },
-        { title: 'Itens', icon: 'mdi-animation', to:'/itens' },
-        { title: 'Clientes', icon: 'mdi-account-multiple', to:'/clientes' }
+        { title: 'Empenhos',
+          icon: 'mdi-sitemap',
+          to:'/',
+          item: [
+            {
+              title: 'Cadastro',
+              icon: 'mdi-sitemap',
+              to:'/clientes'
+            }
+          ]
+        },
+        {
+          title: 'Itens',
+          icon: 'mdi-animation',
+          to:'/itens'
+        },
+        { title: 'Clientes',
+          icon: 'mdi-account-multiple',
+          to:'/clientes'
+        }
       ],
       right: null,
       mini: false

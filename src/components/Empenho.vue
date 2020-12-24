@@ -34,7 +34,6 @@
             </validation-provider>
           </v-col>
         </v-row>
-        {{ soma }}
         <v-row align="center">
           <v-col
               class="d-flex"
@@ -42,6 +41,7 @@
               sm="6"
           >
             <v-select
+                v-model="empenho.idCliente"
                 :items="clientes"
                 item-value="id"
                 item-text="sigla"
@@ -51,7 +51,7 @@
         </v-row>
 
         <v-row>
-          <v-col sm="8">
+          <v-col sm="12">
             <v-card>
             <v-card-title>
               Itens
@@ -82,6 +82,48 @@
                     class="pa-3"
                 />
               </template>
+
+              <template v-slot:item.actions="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                        small
+                        class="mr-2"
+                        @click="editItem(item)"
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                      mdi-truck-delivery
+                    </v-icon>
+                  </template>
+                  <span>Entregar</span>
+                </v-tooltip>
+              </template>
+
+              <template v-slot:item.quantidadeTotal="{ item }">
+                <v-chip
+                    :color="getColorTotal(item.quantidadeTotal)"
+                    dark
+                >
+                  {{ item.quantidadeTotal }}
+                </v-chip>
+              </template>
+              <template v-slot:item.quantidadeEntregue="{ item }">
+                <v-chip
+                    :color="getColorEntregue(item.quantidadeEntregue, item.quantidadeTotal)"
+                    dark
+                >
+                  {{ item.quantidadeEntregue }}
+                </v-chip>
+              </template>
+              <template v-slot:item.quantidadeAEntregar="{ item }">
+                <v-chip
+                    :color="getColorEntregar(item.quantidadeAEntregar, item.quantidadeTotal)"
+                    dark
+                >
+                  {{ item.quantidadeAEntregar }}
+                </v-chip>
+              </template>
             </v-data-table>
             </v-card>
           </v-col>
@@ -101,11 +143,11 @@
                 v-bind:valueWhenIsEmpty="valueWhenIsEmpty"
                 v-bind:options="options"
                 v-bind:properties="properties"
-            />
+            >{{ soma }}</vuetify-money>
           </v-col>
 
         </v-row>
-
+        {{ teste }}
         <v-row>
           <v-btn
               depressed
@@ -204,17 +246,38 @@ export default {
       },
       {
         text: 'Descrição',
-        value: 'descricao'
+        value: 'descricao',
       },
       {
         text: 'Valor',
         value: 'valorUnitario'
-      }
+      },
+      {
+        text: 'Qtde Total',
+        value: 'quantidadeTotal'
+      },
+      {
+        text: 'Qtde Entregue',
+        value: 'quantidadeEntregue'
+      },
+      {
+        text: 'Qtde Entregar',
+        value: 'quantidadeAEntregar'
+      },
+      {
+        text: 'Ações',
+        value: 'actions',
+        sortable: false
+      },
 
     ],
     messagemAlerta: '',
     alerta: false,
-    tipoAlerta: 'success'
+    tipoAlerta: 'success',
+    dialog: false,
+    dialogDelete: false,
+    editedIndex: -1,
+    editedItem: {}
 
   }),
   mounted() {
@@ -227,6 +290,10 @@ export default {
       this.valorEmpenho = this.selected.reduce((acumulador, valorAtual) => {
       return acumulador + valorAtual.valorUnitario;
       }, 0);
+    },
+    teste() {
+      this.empenho.itensDTO = this.selected;
+      this.empenho.valor = this.valorEmpenho;
     }
   },
   methods: {
@@ -260,6 +327,11 @@ export default {
         this.abrirAlerta('Não foi possível efetuar o cadastro :(', 'error')
       }
     },
+    editItem (item) {
+      this.editedIndex = this.itens.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialog = true
+    },
     abrirAlerta(msg, tipo) {
       this.messagemAlerta = msg
       this.tipoAlerta = tipo
@@ -271,7 +343,19 @@ export default {
     fecharAlerta() {
       this.messagemAlerta = ''
       this.alerta = false
-    }
+    },
+    getColorTotal (quantidadeTotal) {
+      if (quantidadeTotal >= 1) return 'blue'
+      else return 'green'
+    },
+    getColorEntregue(quantidadeEntregue, quantidadeTotal) {
+      if (quantidadeEntregue >= quantidadeTotal) return 'blue'
+      else return 'green'
+    },
+    getColorEntregar(quantidadeEntregar, quantidadeTotal) {
+      if (quantidadeEntregar <= quantidadeTotal) return 'orange'
+      else return 'gray'
+    },
   },
 }
 </script>

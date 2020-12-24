@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import CadastroItem from '@/components/CadastroItem.vue';
+import Item from '@/components/Item.vue';
 import CoreView from "@/components/CoreView";
 import Clientes from "@/components/Clientes";
 
@@ -12,7 +12,7 @@ export default {
 
   components: {
     CoreView,
-    CadastroItem,
+    Item,
     Clientes
   },
 

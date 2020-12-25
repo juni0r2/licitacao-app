@@ -24,43 +24,20 @@
         dense
         nav
     >
-    <v-list-item
-        v-for="item in items"
-        :key="item.title"
-        link
-        :to="item.to"
-    >
-      <v-list-group
-          no-action
+      <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          link
+          :to="item.to"
       >
+        <v-list-item-icon>
+          <v-icon>{{ item.icon }}</v-icon>
+        </v-list-item-icon>
 
-        <template v-slot:activator>
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </template>
-
-        <v-list-item
-            v-for="sub in item.subitem"
-            :key="sub.title"
-            link
-            :to="sub.to"
-        >
-          <v-list-item-title>{{sub.title}}</v-list-item-title>
-
-          <v-list-item-icon>
-            <v-icon>{{sub.icon}}</v-icon>
-          </v-list-item-icon>
-
-        </v-list-item>
-
-      </v-list-group>
-    </v-list-item>
-
+        <v-list-item-content>
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
 
     </v-list>
 
@@ -84,27 +61,15 @@ export default {
   name: "MenuLateral",
   data () {
     return {
-      admins: [
-        ['Management', 'mdi-account-multiple-outline'],
-        ['Settings', 'mdi-cog-outline'],
-      ],
-      cruds: [
-        ['Create', 'mdi-plus-outline'],
-        ['Read', 'mdi-file-outline'],
-        ['Update', 'mdi-update'],
-        ['Delete', 'mdi-delete'],
-      ],
+      model: 1,
       items: [
-        { title: 'Empenhos',
+        { title: 'Cadastro Empenho',
           icon: 'mdi-sitemap',
           to:'/',
-          subitem: [
-            {
-              title: 'Cadastro',
-              icon: 'mdi-account-multiple',
-              to:'/clientes'
-            }
-          ]
+        },
+        { title: 'Lista Empenhos',
+          icon: 'mdi-sitemap',
+          to:'/listaEmpenhos',
         },
         {
           title: 'Itens',
@@ -114,7 +79,7 @@ export default {
         { title: 'Clientes',
           icon: 'mdi-account-multiple',
           to:'/clientes'
-        }
+        },
       ],
       right: null,
       mini: false

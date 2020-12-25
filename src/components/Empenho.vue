@@ -41,11 +41,11 @@
               sm="6"
           >
             <v-select
-                v-model="empenho.idCliente"
+                v-model="empenho.clienteDTO"
                 :items="clientes"
-                item-value="id"
                 item-text="sigla"
                 label="Clientes"
+                return-object
             ></v-select>
           </v-col>
         </v-row>
@@ -53,78 +53,82 @@
         <v-row>
           <v-col sm="12">
             <v-card>
-            <v-card-title>
-              Itens
-              <v-spacer></v-spacer>
-              <v-text-field
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  label="Pesquisar"
-                  single-line
-                  hide-details
-              ></v-text-field>
-            </v-card-title>
-            <v-data-table
-                :search="search"
-                v-model="selected"
-                :headers="headers"
-                :items="itens"
-                :single-select="singleSelect"
-                item-key="codigoItem"
-                show-select
-                class="elevation-1"
-                :items-per-page="5"
-            >
-              <template v-slot:top>
-                <v-switch
-                    v-model="singleSelect"
-                    label="Selecionar individual"
-                    class="pa-3"
-                />
-              </template>
+              <v-card-title>
+                Itens
+                <v-spacer></v-spacer>
+                <v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Pesquisar"
+                    single-line
+                    hide-details
+                ></v-text-field>
+              </v-card-title>
 
-              <template v-slot:item.actions="{ item }">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                        small
-                        class="mr-2"
-                        @click="editItem(item)"
-                        v-bind="attrs"
-                        v-on="on"
-                    >
-                      mdi-truck-delivery
-                    </v-icon>
-                  </template>
-                  <span>Entregar</span>
-                </v-tooltip>
-              </template>
+              <v-data-table
+                  :search="search"
+                  v-model="selected"
+                  :headers="headers"
+                  :items="itens"
+                  :single-select="singleSelect"
+                  item-key="codigoItem"
+                  show-select
+                  class="elevation-1"
+                  :items-per-page="5"
+              >
 
-              <template v-slot:item.quantidadeTotal="{ item }">
-                <v-chip
-                    :color="getColorTotal(item.quantidadeTotal)"
-                    dark
-                >
-                  {{ item.quantidadeTotal }}
-                </v-chip>
-              </template>
-              <template v-slot:item.quantidadeEntregue="{ item }">
-                <v-chip
-                    :color="getColorEntregue(item.quantidadeEntregue, item.quantidadeTotal)"
-                    dark
-                >
-                  {{ item.quantidadeEntregue }}
-                </v-chip>
-              </template>
-              <template v-slot:item.quantidadeAEntregar="{ item }">
-                <v-chip
-                    :color="getColorEntregar(item.quantidadeAEntregar, item.quantidadeTotal)"
-                    dark
-                >
-                  {{ item.quantidadeAEntregar }}
-                </v-chip>
-              </template>
-            </v-data-table>
+                <template v-slot:item.quantidadeTotal="props">
+                  <v-edit-dialog
+                      :return-value.sync="props.item.quantidadeTotal"
+                      @save="save"
+                      @cancel="cancel"
+                      @open="open"
+                      @close="close"
+                  >
+                    {{ props.item.quantidadeTotal }}
+                    <template v-slot:input>
+                      <div class="mt-4 title">
+                        Salvar Valor
+                      </div>
+                      <v-text-field
+                          v-model="props.item.quantidadeTotal"
+                          :rules="[max25chars]"
+                          label="Editar Quantidade"
+                          single-line
+                          counter
+                          autofocus
+                      ></v-text-field>
+                    </template>
+                  </v-edit-dialog>
+                </template>
+
+                <template v-slot:top>
+                  <v-switch
+                      v-model="singleSelect"
+                      label="Selecionar individual"
+                      class="pa-3"
+                  />
+                </template>
+              </v-data-table>
+
+              <v-snackbar
+                  v-model="snack"
+                  :timeout="3000"
+                  :color="snackColor"
+              >
+                {{ snackText }}
+
+                <template v-slot:action="{ attrs }">
+                  <v-btn
+                      v-bind="attrs"
+                      text
+                      @click="snack = false"
+                  >
+                    Close
+                  </v-btn>
+                </template>
+              </v-snackbar>
+
             </v-card>
           </v-col>
 
@@ -147,7 +151,7 @@
           </v-col>
 
         </v-row>
-        {{ teste }}
+        {{ preencherItensObjetoEmpenho }}
         <v-row>
           <v-btn
               depressed
@@ -206,6 +210,10 @@ export default {
   },
   data: () => ({
 
+    max25chars: v => v.length <= 25 || 'Input too long!',
+    snack: false,
+    snackColor: '',
+    snackText: '',
     search: '',
     itens: [],
     empenhos: [],
@@ -255,21 +263,7 @@ export default {
       {
         text: 'Qtde Total',
         value: 'quantidadeTotal'
-      },
-      {
-        text: 'Qtde Entregue',
-        value: 'quantidadeEntregue'
-      },
-      {
-        text: 'Qtde Entregar',
-        value: 'quantidadeAEntregar'
-      },
-      {
-        text: 'Ações',
-        value: 'actions',
-        sortable: false
-      },
-
+      }
     ],
     messagemAlerta: '',
     alerta: false,
@@ -288,20 +282,38 @@ export default {
   computed: {
     soma() {
       this.valorEmpenho = this.selected.reduce((acumulador, valorAtual) => {
-      return acumulador + valorAtual.valorUnitario;
+      return acumulador + (valorAtual.valorUnitario * valorAtual.quantidadeTotal);
       }, 0);
     },
-    teste() {
-      this.empenho.itensDTO = this.selected;
+    preencherItensObjetoEmpenho() {
+      this.empenho.itensForm = this.selected;
       this.empenho.valor = this.valorEmpenho;
     }
   },
   methods: {
+    save () {
+      this.snack = true
+      this.snackColor = 'success'
+      this.snackText = 'Data saved'
+    },
+    cancel () {
+      this.snack = true
+      this.snackColor = 'error'
+      this.snackText = 'Canceled'
+    },
+    open () {
+      this.snack = true
+      this.snackColor = 'info'
+      this.snackText = 'Dialog opened'
+    },
+    close () {
+    },
     submit () {
       this.$refs.observer.validate()
     },
     clear () {
       this.empenho = {};
+      this.valorEmpenho = '';
       this.$refs.observer.reset()
     },
     async buscarItens() {
@@ -344,18 +356,7 @@ export default {
       this.messagemAlerta = ''
       this.alerta = false
     },
-    getColorTotal (quantidadeTotal) {
-      if (quantidadeTotal >= 1) return 'blue'
-      else return 'green'
-    },
-    getColorEntregue(quantidadeEntregue, quantidadeTotal) {
-      if (quantidadeEntregue >= quantidadeTotal) return 'blue'
-      else return 'green'
-    },
-    getColorEntregar(quantidadeEntregar, quantidadeTotal) {
-      if (quantidadeEntregar <= quantidadeTotal) return 'orange'
-      else return 'gray'
-    },
+
   },
 }
 </script>

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Item from "@/components/Item";
 import Clientes from "@/components/Clientes";
 import Empenho from "@/components/Empenho";
+import ListaEmpenhos from "@/components/ListaEmpenhos";
 
 Vue.use(VueRouter)
 
@@ -11,6 +12,10 @@ const routes = [
     path: '/',
     name: 'Empenhos',
     component: Empenho
+  },{
+    path: '/listaEmpenhos',
+    name: 'Lista Empenhos',
+    component: ListaEmpenhos
   },
   {
     path: '/itens',

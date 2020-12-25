@@ -12,8 +12,6 @@ export default {
 
   components: {
     CoreView,
-    Item,
-    Clientes
   },
 
   data: () => ({

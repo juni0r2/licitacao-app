@@ -5,8 +5,6 @@
       :mini-variant.sync="mini"
       mini-variant-width="60"
       mobile-breakpoint="720"
-      dark
-      color="blue-grey darken-2"
   >
     <v-list-item>
       <v-list-item-content>
@@ -26,20 +24,43 @@
         dense
         nav
     >
-      <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          link
-          :to="item.to"
+    <v-list-item
+        v-for="item in items"
+        :key="item.title"
+        link
+        :to="item.to"
+    >
+      <v-list-group
+          no-action
       >
-        <v-list-item-icon>
-          <v-icon>{{ item.icon }}</v-icon>
-        </v-list-item-icon>
 
-        <v-list-item-content>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+        <template v-slot:activator>
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </template>
+
+        <v-list-item
+            v-for="sub in item.subitem"
+            :key="sub.title"
+            link
+            :to="sub.to"
+        >
+          <v-list-item-title>{{sub.title}}</v-list-item-title>
+
+          <v-list-item-icon>
+            <v-icon>{{sub.icon}}</v-icon>
+          </v-list-item-icon>
+
+        </v-list-item>
+
+      </v-list-group>
+    </v-list-item>
+
 
     </v-list>
 
@@ -63,14 +84,24 @@ export default {
   name: "MenuLateral",
   data () {
     return {
+      admins: [
+        ['Management', 'mdi-account-multiple-outline'],
+        ['Settings', 'mdi-cog-outline'],
+      ],
+      cruds: [
+        ['Create', 'mdi-plus-outline'],
+        ['Read', 'mdi-file-outline'],
+        ['Update', 'mdi-update'],
+        ['Delete', 'mdi-delete'],
+      ],
       items: [
         { title: 'Empenhos',
           icon: 'mdi-sitemap',
           to:'/',
-          item: [
+          subitem: [
             {
               title: 'Cadastro',
-              icon: 'mdi-sitemap',
+              icon: 'mdi-account-multiple',
               to:'/clientes'
             }
           ]
@@ -101,7 +132,7 @@ export default {
   }
 
   .drawer-bottom a {
-    color: white;
+    color: darkgray;
   }
 
 </style>
